@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>local chat</title>
+</head>
+<body>
+    <div id="box" style="overflow-y:auto; height: 400px">
+        <div class="chat">
+        </div>
+
+    </div>
+        
+    <div>
+    <textarea id="name" placeholder="name here"></textarea>
+    <textarea id="texter" placeholder="message here"></textarea>
+    <button id="sender" >socket send</button>
+    </div>
+    <ref id="ipaddr" style="display: none"><%= ipaddr %></ref>
+    <ref id="wsport" style="display: none"><%= wsport %></ref>
+</body>
+<script>
+    const ipAddr = document.getElementById("ipaddr").innerHTML
+    const wsPort = document.getElementById("wsport").innerHTML
+
+    const socket = new WebSocket(`ws://${ipAddr}:${wsPort}`)
+
+    document.getElementById("sender").addEventListener("click", () => {
+        const message = document.getElementById("texter").value 
+        const name = document.getElementById("name").value
+        socket.send(JSON.stringify({name, message}));
+    })
+
+    document.getElementById("texter").addEventListener("submit", () => {
+        console.log("e")
+    })
+
+    socket.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+        //The top of the chat box
+        const parent = document.getElementById("box");
+        const topChat = document.getElementsByClassName("chat")[0];
+
+        //Creating a new chat
+        const newChat = document.createElement('div');
+
+        newChat.style = "background-color: rgb(255, 181, 181); margin-top: 5px; padding: 10px";
+        newChat.innerText = `${response.name}: ${response.message}`;
+
+        //Add to UI
+        parent.insertBefore(newChat, topChat);
+        parent.scrollTop = parent.scrollHeight;
+
+
+    }
+</script>
+</html>
