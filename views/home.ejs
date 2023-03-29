@@ -5,9 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>local chat</title>
+    
 </head>
 <body>
-    <div id="box" style="overflow-y:auto; height: 400px">
+    <div>
+        <h1 style="margin-bottom: 0">Chatbot by Kasra Farsoudi</h1>
+        <a>ws://<%=ipaddr%>:<%=wsport%></a>
+    </div>
+    <div id="box" style="overflow-y:auto; height: 400px; background-color: #2F3C7E">
         <div class="chat">
         </div>
 
@@ -18,6 +23,7 @@
     <textarea id="texter" placeholder="message here"></textarea>
     <button id="sender" >socket send</button>
     </div>
+    <a id="warn" style="color: red; display: none">Please wait 3 seconds.</a>
     <ref id="ipaddr" style="display: none"><%= ipaddr %></ref>
     <ref id="wsport" style="display: none"><%= wsport %></ref>
 </body>
@@ -26,11 +32,33 @@
     const wsPort = document.getElementById("wsport").innerHTML
 
     const socket = new WebSocket(`ws://${ipAddr}:${wsPort}`)
+    const empty = /^\s*$/
+
+    //flag that is set to false for 3 seconds every time we submit
+    let timeFlag = true;
+    const restrictTime = async () => {
+        const label = document.getElementById("warn");
+        timeFlag = false;
+        label.style = "color: red; display: flex";
+
+        for ( let i = 3; i >= 0 ; i-- ){
+            label.innerText = `Please wait ${i} seconds.`;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+            timeFlag = true;
+            label.style = "color: red; display: none";
+    }
+
 
     document.getElementById("sender").addEventListener("click", () => {
         const message = document.getElementById("texter").value 
         const name = document.getElementById("name").value
-        socket.send(JSON.stringify({name, message}));
+        document.getElementById("texter").value = "";
+
+        if (!empty.test(message) && timeFlag) {
+            socket.send(JSON.stringify({name, message}));
+            restrictTime();
+        }
     })
 
     document.getElementById("texter").addEventListener("submit", () => {
@@ -46,7 +74,7 @@
         //Creating a new chat
         const newChat = document.createElement('div');
 
-        newChat.style = "background-color: rgb(255, 181, 181); margin-top: 5px; padding: 10px";
+        newChat.style = "background-color: #FBEAEB; margin: 15px; padding: 10px; border-radius: 5px";
         newChat.innerText = `${response.name}: ${response.message}`;
 
         //Add to UI
