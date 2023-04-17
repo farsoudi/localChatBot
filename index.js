@@ -14,19 +14,46 @@ const {
 } = process.env;
 
 
+//Id generator
+function generateUniqueId() {
+    const chars = '0123456789';
+    let id = '';
+    for (let i = 0; i < 8; i++) {
+      id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return id;
+  }
+
+
 
 //websocket server
 import WebSocket, { WebSocketServer } from 'ws';
 const wss = new WebSocketServer({port: WS_PORT})
 wss.on('connection', (ws) => {
-    console.log("Client connected!\n")
+    ws.id = generateUniqueId();
+    console.log(`Client [${ws.id}]connected!`)
+
+    // Notify connection
+    wss.clients.forEach((client) => {
+        client.send(JSON.stringify({name: 'SERVER', message: `User ${ws.id} has connected.`}))
+    })
 
     ws.on('error', console.error);
 
     ws.on('message', (data) => {
-        console.log(`sending out: ${data}`)
+        let payload = JSON.parse(data);
+        payload.id = ws.id;
+        payload = JSON.stringify(payload);
+        console.log(payload)
         wss.clients.forEach((client) => {
-                client.send(`${data}`)
+                client.send(`${payload}`)
+        })
+    })
+
+    ws.on('close', (code) => {
+        console.log('Client disconnected!')
+        wss.clients.forEach((client) => {
+            client.send(JSON.stringify({name: 'SERVER', message: `User ${ws.id} has disconnected.`}))
         })
     })
 

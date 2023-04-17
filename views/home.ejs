@@ -75,7 +75,11 @@
         const newChat = document.createElement('div');
 
         newChat.style = "background-color: #FBEAEB; margin: 15px; padding: 10px; border-radius: 5px";
-        newChat.innerText = `${response.name}: ${response.message}`;
+
+        const text = document.createElement("a");
+        text.innerText = `${response.name} (${response.id ? response.id : ''}): ${response.message}`;
+
+        newChat.appendChild(text)
 
         //Add to UI
         parent.insertBefore(newChat, topChat);
