@@ -12,7 +12,7 @@ IP_ADDR="192.168.1.10"
 WS_PORT=8080
 * Port to host websocket server.
 
-SERV_PORT=3000
+SERV_PORT=80
 * Port to host http server.
 
 ### Optional
