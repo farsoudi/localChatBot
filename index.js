@@ -10,8 +10,11 @@ const app = express();
 const {
     IP_ADDR, //Address of the host. Ex: IP_ADDR="192.168.1.10"
     WS_PORT, //Port of the websocket server. Ex: WS_PORT=8080
-    SERV_PORT //Port of the HTML server. Ex: SERV_PORT=80
+    SERV_PORT, //Port of the HTML server. Ex: SERV_PORT=80
+    DISCORD_WEBHOOK
 } = process.env;
+
+
 
 
 //Id generator
@@ -40,7 +43,7 @@ wss.on('connection', (ws) => {
 
     ws.on('error', console.error);
 
-    ws.on('message', (data) => {
+    ws.on('message', async (data) => {
         let payload = JSON.parse(data);
         payload.id = ws.id;
         payload = JSON.stringify(payload);
@@ -48,6 +51,8 @@ wss.on('connection', (ws) => {
         wss.clients.forEach((client) => {
                 client.send(`${payload}`)
         })
+        if(DISCORD_WEBHOOK)
+            sendToDiscord(data);
     })
 
     ws.on('close', (code) => {
@@ -73,6 +78,24 @@ app.get('/', (req, res) => {
         }
     })
 })
+
+
+//Connection to Discord
+const sendToDiscord = async (data) => {
+    const initialData = JSON.parse(data);
+    const payload = JSON.stringify({
+        'content': initialData.message,
+        'username': initialData.name
+    })
+    const res = await fetch(DISCORD_WEBHOOK, 
+        {
+            method: 'POST',
+            body: payload,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+}
 
 
 
