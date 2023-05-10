@@ -15,7 +15,7 @@ WS_PORT=8080
 SERV_PORT=3000
 * Port to host http server.
 
-#### Optional
+### Optional
 
 DISCORD_WEBHOOK="https://discord.com/api/webhooks/x/x"
 * Webhook connection to send all client messages.
