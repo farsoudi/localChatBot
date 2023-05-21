@@ -22,5 +22,5 @@ DISCORD_WEBHOOK="https://discord.com/api/webhooks/x/x"
 
 ## What's new 
 #### Log chatroom to Discord via Webhook
-* Simply add a webhook URL for your discord guild to the .env file to get all chats on disord in real time.
+* Simply add a webhook URL for your discord guild to the .env file to get all chats on discord in real time.
     * [Tutorial on Discord Webhooks](https://www.youtube.com/watch?v=zxi926qhP7w)
